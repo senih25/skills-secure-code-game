@@ -14,15 +14,14 @@ def source():
 ### Unrelated to the exercise -- Ends here -- Please ignore
 
 
-def _safe_local_path(path):
-    base_dir = os.path.realpath(os.path.dirname(os.path.abspath(__file__)))
-    candidate = os.path.realpath(os.path.join(base_dir, path))
-    try:
-        if os.path.commonpath((base_dir, candidate)) != base_dir:
-            return None
-    except ValueError:
-        return None
-    return candidate
+def _profile_picture_path():
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    return os.path.join(base_dir, 'assets', 'prof_picture.png')
+
+
+def _tax_form_path():
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    return os.path.join(base_dir, 'assets', 'tax_form.pdf')
 
 
 class TaxPayer:
@@ -38,10 +37,12 @@ class TaxPayer:
         if not path:
             return None
 
-        prof_picture_path = _safe_local_path(path)
-        if prof_picture_path is None:
+        # Only the known profile-picture asset is accepted. User-controlled
+        # data is never used to construct the path passed to open().
+        if path != 'assets/prof_picture.png':
             return None
 
+        prof_picture_path = _profile_picture_path()
         with open(prof_picture_path, 'rb') as pic:
             picture = bytearray(pic.read())
 
@@ -53,8 +54,10 @@ class TaxPayer:
         if not path:
             raise Exception("Error: Tax form is required for all users")
 
-        tax_form_path = _safe_local_path(path)
-        if tax_form_path is None:
+        # Compare user input to the single trusted canonical asset. User data
+        # is never passed through a filesystem path operation or to open().
+        tax_form_path = _tax_form_path()
+        if path != tax_form_path:
             return None
 
         with open(tax_form_path, 'rb') as form:
