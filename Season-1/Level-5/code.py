@@ -2,9 +2,7 @@
 
 # This is the last level of our first season, good luck!
 
-import binascii
 import secrets
-import hashlib
 import os
 import bcrypt
 
@@ -25,18 +23,16 @@ class Random_generator:
 
 
 class SHA256_hasher:
+    """Legacy class name retained; bcrypt performs password hashing directly."""
 
-    # produces the password hash by combining a SHA-256 prehash with bcrypt
     def password_hash(self, password, salt):
-        password = binascii.hexlify(hashlib.sha256(password.encode()).digest())
-        password_hash = bcrypt.hashpw(password, salt)
-        return password_hash.decode('ascii')
+        return bcrypt.hashpw(password.encode('utf-8'), salt).decode('ascii')
 
-    # verifies the supplied password against the bcrypt hash
     def password_verification(self, password, password_hash):
-        password = binascii.hexlify(hashlib.sha256(password.encode()).digest())
-        password_hash = password_hash.encode('ascii')
-        return bcrypt.checkpw(password, password_hash)
+        return bcrypt.checkpw(
+            password.encode('utf-8'),
+            password_hash.encode('ascii'),
+        )
 
 
 class MD5_hasher:
